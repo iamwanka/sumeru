@@ -30,8 +30,8 @@ function App() {
       <main className="mx-auto max-w-7xl px-4">
         <ResponsiveMasonry
           columnsCountBreakPoints={{
-            350: 1,
-            640: 2,
+            350: 2,
+            640: 3,
             768: 3,
             1024: 4,
             1440: 5,
