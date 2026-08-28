@@ -3,6 +3,7 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 import { CardImage } from "@/components/cards/card-image";
 import "./App.css";
+import { Spinner } from "./components/ui/spinner";
 
 interface ImageData {
   id: number;
@@ -11,11 +12,28 @@ interface ImageData {
 
 function App() {
   const [data, setData] = useState<ImageData[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/data/barber_mock_data.json")
-      .then((res) => res.json())
-      .then(setData);
+      .then((response) => {
+
+        if (!response.ok) {
+          throw new Error(`Failed to load the JSON file ${response.status}`)
+        }
+
+        return response.json();
+      })
+      .then(setData)
+      .catch(err => {
+        setErrorMessage(err.message);
+        console.error('Error failed to loaded the JSON file', err)
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
   }, []);
 
   return (
@@ -28,25 +46,40 @@ function App() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4">
-        <ResponsiveMasonry
-          columnsCountBreakPoints={{
-            350: 2,
-            640: 3,
-            768: 3,
-            1024: 4,
-            1440: 5,
-          }}
-        >
-          <Masonry gutter="24px">
-            {data.map((image) => (
-              <CardImage
-                key={image.id}
-                id={image.id}
-                src={image.src}
-              />
-            ))}
-          </Masonry>
-        </ResponsiveMasonry>
+
+        {
+          isLoading ?
+            <div className="flex flex-col items-center">
+              <Spinner className="size-14" />
+              <p>Cargando tu contenido....</p>
+            </div>
+            :
+            errorMessage ?
+              <div>
+                {errorMessage}
+              </div>
+              :
+              <ResponsiveMasonry
+                columnsCountBreakPoints={{
+                  350: 2,
+                  640: 3,
+                  768: 3,
+                  1024: 4,
+                  1440: 5,
+                }}
+              >
+                <Masonry gutter="24px">
+                  {data.map((image) => (
+                    <CardImage
+                      key={image.id}
+                      id={image.id}
+                      src={image.src}
+                    />
+                  ))}
+                </Masonry>
+              </ResponsiveMasonry>
+        }
+
       </main>
     </>
   );
