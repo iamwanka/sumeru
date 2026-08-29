@@ -5,9 +5,15 @@ import { CardImage } from "@/components/cards/card-image";
 import "./App.css";
 import { Spinner } from "./components/ui/spinner";
 
+interface Resolution {
+  x: number;
+  y: number;
+}
+
 interface ImageData {
   id: number;
   src: string;
+  resolution: Resolution;
 }
 
 function App() {
@@ -74,6 +80,7 @@ function App() {
                       key={image.id}
                       id={image.id}
                       src={image.src}
+                      resolution={image.resolution}
                     />
                   ))}
                 </Masonry>
